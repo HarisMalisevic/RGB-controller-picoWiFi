@@ -33,7 +33,19 @@ class RGB_Controller:
 
         print(f"R: {red_u16}, G: {green_u16}, B: {blue_u16}")
 
-    def randomize(self, duration_seconds, interval_seconds):
+    
+    def random_rgb(self):
+        """
+        Randomizes and sets R, G, and B diodes within the range of 0 to 65535.
+        """
+        rand_red = randint(0, 65535)
+        rand_green = randint(0, 65535)
+        rand_blue = randint(0, 65535)
+
+        self.set_rgb(rand_red, rand_green, rand_blue)
+
+
+    def effect_randomize(self, duration_seconds, interval_seconds):
         """
         Randomizes R, G, and B diodes within the range of 0 to 65535.
 
@@ -46,10 +58,6 @@ class RGB_Controller:
         """
         start_time = time()
         while time() - start_time < duration_seconds:
-            rand_red = randint(0, 65535)
-            rand_green = randint(0, 65535)
-            rand_blue = randint(0, 65535)
-
-            self.set_rgb(rand_red, rand_green, rand_blue)
+            self.random_rgb()
 
             sleep(interval_seconds)
