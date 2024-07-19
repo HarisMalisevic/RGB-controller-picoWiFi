@@ -6,12 +6,15 @@ from RGB_Controller import RGB_Controller
 # RGB Controller Setup
 RGB_CONTROLLER = RGB_Controller(17, 16, 19)
 
+red_percent = 0
+green_percent = 0
+blue_percent = 0
 
 # WiFi configuration
 WIFI_SSID = "Malisevic"
 WIFI_PASSWORD = "Ari_bjelov"
 
-#Connecting to WiFi
+# Connecting to WiFi
 print("Connecting to WiFi: ", WIFI_SSID)
 WIFI = network.WLAN(network.STA_IF)
 WIFI.active(True)
@@ -33,16 +36,45 @@ MQTT_CLIENT_NAME = "RGB-Controller-Malisevic"
 MQTT_TOPIC_RED = b"RGB-Controller-Malisevic/red"
 MQTT_TOPIC_GREEN = b"RGB-Controller-Malisevic/green"
 MQTT_TOPIC_BLUE = b"RGB-Controller-Malisevic/blue"
+MQTT_TOPIC_RGB = b"RGB-Controller-Malisevic/RGB_set"
+
+def parse_rgb_string(rgb_bytes):
+    # Decode the bytes object to a string
+    rgb_string = rgb_bytes.decode('utf-8')
+    
+    # Extract the numeric values from the string
+    rgb_values = rgb_string.split('(')[1].split(')')[0].split(',')
+    
+    # Convert the extracted values to integers
+    r, g, b = [int(value.strip()) for value in rgb_values]
+    
+    # Scale the values to a range of 0 to 100
+    r_scaled = (r / 255) * 100
+    g_scaled = (g / 255) * 100
+    b_scaled = (b / 255) * 100
+    
+    return r_scaled, g_scaled, b_scaled
+
+# Example usage
+rgb_string = b"rgb(86, 255, 0)"
+r, g, b = parse_rgb_string(rgb_string)
+print(r, g, b)
 
 # MQTT Filtering recieved messages
 def custom_dispatcher(topic, msg):
+    global red_percent, green_percent, blue_percent
 
     if topic == MQTT_TOPIC_RED:
-        RGB_CONTROLLER.red.duty_u16(int(float(msg))) 
+        red_percent = int(float(msg))
     elif topic == MQTT_TOPIC_GREEN:
-        RGB_CONTROLLER.green.duty_u16(int(float(msg))) 
+        green_percent = int(float(msg))
     elif topic == MQTT_TOPIC_BLUE:
-        RGB_CONTROLLER.blue.duty_u16(int(float(msg))) 
+        blue_percent = int(float(msg))
+    elif topic == MQTT_TOPIC_RGB:
+        red_percent, green_percent, blue_percent = parse_rgb_string(msg)
+
+    RGB_CONTROLLER.set_rgb_percent(red_percent, green_percent, blue_percent)
+
 
 # MQTT Connecting to broker
 CLIENT = simple.MQTTClient(client_id=MQTT_CLIENT_NAME, server=MQTT_SERVER, port=1883)
@@ -54,12 +86,16 @@ CLIENT.set_callback(custom_dispatcher)
 CLIENT.subscribe(MQTT_TOPIC_RED)
 CLIENT.subscribe(MQTT_TOPIC_GREEN)
 CLIENT.subscribe(MQTT_TOPIC_BLUE)
+CLIENT.subscribe(MQTT_TOPIC_RGB)
+
 
 # MQTT Check for new messages
 def recieve_data(timer):
     CLIENT.check_msg()
     CLIENT.check_msg()
     CLIENT.check_msg()
+    CLIENT.check_msg()
+
 
 RECIEVE_DATA_TIMER = Timer(period=500, mode=Timer.PERIODIC, callback=recieve_data)
 
