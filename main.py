@@ -3,6 +3,8 @@ import simple
 from machine import Timer
 from RGB_Controller import RGB_Controller
 
+U_16 = 2**16 - 1
+
 # RGB Controller Setup
 RGB_CONTROLLER = RGB_Controller(17, 16, 19)
 
@@ -34,13 +36,17 @@ def reconnect_wifi():
     print("Connected to network!")
     print("IP address:", WIFI.ifconfig()[0])
 
+
 # Reconnect to WiFi if the connection broke
 def check_wifi_connection(timer):
     if not WIFI.isconnected():
         reconnect_wifi()
 
+
 # Check WiFi connection every 1 minute
-CHECK_CONNECTION_TIMER = Timer(period=60000, mode=Timer.PERIODIC, callback=check_wifi_connection)
+CHECK_CONNECTION_TIMER = Timer(
+    period=60000, mode=Timer.PERIODIC, callback=check_wifi_connection
+)
 
 # MQTT Configuration
 
@@ -53,42 +59,50 @@ MQTT_TOPIC_GREEN = b"RGB-Controller-Malisevic/green"
 MQTT_TOPIC_BLUE = b"RGB-Controller-Malisevic/blue"
 MQTT_TOPIC_RGB = b"RGB-Controller-Malisevic/RGB_set"
 
+
 def parse_rgb_string(rgb_bytes):
     # Decode the bytes object to a string
-    rgb_string = rgb_bytes.decode('utf-8')
-    
+    rgb_string = rgb_bytes.decode("utf-8")
+
     # Extract the numeric values from the string
-    rgb_values = rgb_string.split('(')[1].split(')')[0].split(',')
-    
-    # Convert the extracted values to integers
+    rgb_values = rgb_string.split("(")[1].split(")")[0].split(",")
+
+    # Convert the extracted values to integers in ragne [0, 255]
     r, g, b = [int(value.strip()) for value in rgb_values]
-    
-    # Scale the values to a range of 0 to 100
-    r_scaled = (r / 255) * 100
-    g_scaled = (g / 255) * 100
-    b_scaled = (b / 255) * 100
-    
+
+    # Scale the values to a range of 0 to 65535 (U_16)
+    r_scaled = (r / 255) * U_16
+    g_scaled = (g / 255) * U_16
+    b_scaled = (b / 255) * U_16
+
     return r_scaled, g_scaled, b_scaled
+
 
 # Example usage
 rgb_string = b"rgb(86, 255, 0)"
 r, g, b = parse_rgb_string(rgb_string)
 print(r, g, b)
 
+
 # MQTT Filtering recieved messages
 def custom_dispatcher(topic, msg):
     global red_percent, green_percent, blue_percent
 
     if topic == MQTT_TOPIC_RED:
-        red_percent = int(float(msg))
-    elif topic == MQTT_TOPIC_GREEN:
-        green_percent = int(float(msg))
-    elif topic == MQTT_TOPIC_BLUE:
-        blue_percent = int(float(msg))
-    elif topic == MQTT_TOPIC_RGB:
-        red_percent, green_percent, blue_percent = parse_rgb_string(msg)
+        r = int(float(msg))
+        RGB_CONTROLLER.set_red_u16(r)
 
-    RGB_CONTROLLER.set_rgb_percent(red_percent, green_percent, blue_percent)
+    elif topic == MQTT_TOPIC_GREEN:
+        g = int(float(msg))
+        RGB_CONTROLLER.set_green_u16(g)
+
+    elif topic == MQTT_TOPIC_BLUE:
+        b = int(float(msg))
+        RGB_CONTROLLER.set_blue_u16(b)
+
+    elif topic == MQTT_TOPIC_RGB:
+        r, g, b = parse_rgb_string(msg)
+        RGB_CONTROLLER.set_rgb_u16(r, g, b)
 
 
 # MQTT Connecting to broker

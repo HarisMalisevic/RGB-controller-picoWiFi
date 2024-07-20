@@ -18,7 +18,7 @@ class RGB_Controller:
         self.green.duty_u16(0)
         self.blue.duty_u16(0)
 
-    def set_freq(self, freq):
+    def set_pwm_freq(self, freq):
         self.red.freq(freq)
         self.green.freq(freq)
         self.blue.freq(freq)
@@ -33,18 +33,34 @@ class RGB_Controller:
         self.blue.duty_u16(blue_u16)
 
         print(f"R: {red_u16}, G: {green_u16}, B: {blue_u16}")
-
-    def set_rgb_percent(self, red_percent, green_percent, blue_percent):
+    
+    def set_red_u16(self, red_u16):
         """
-        Sets the R, G and B diodes to specified values in range of 0 to 100.
+        Sets the Red diode to specified value in range of 0 to 65535 (16-bit value).
         Prints values to terminal.
         """
-        U_16 = 2**16 - 1
-        self.red.duty_u16(int(red_percent * U_16))
-        self.green.duty_u16(int(green_percent * U_16))
-        self.blue.duty_u16(int(blue_percent * U_16))
+        self.red.duty_u16(red_u16)
 
-        print(f"R: {red_percent}%, G: {green_percent}%, B: {blue_percent}%")
+        print(f"R: {self.red}, G: {self.green}, B: {self.blue}")
+
+    def set_green_u16(self, green_u16):
+        """
+        Sets the Green diode to specified value in range of 0 to 65535 (16-bit value).
+        Prints values to terminal.
+        """
+
+        self.green.duty_u16(green_u16)
+
+        print(f"R: {self.red}, G: {self.green}, B: {self.blue}")
+
+    def set_blue_u16(self, blue_u16):
+        """
+        Sets the Blue diode to specified value in range of 0 to 65535 (16-bit value).
+        Prints values to terminal.
+        """
+        self.red.duty_u16(blue_u16)
+
+        print(f"R: {self.red}, G: {self.green}, B: {self.blue}")
 
     def random_rgb(self):
         """
