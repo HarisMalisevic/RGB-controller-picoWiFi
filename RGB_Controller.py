@@ -5,6 +5,8 @@ from random import randint
 
 class RGB_Controller:
 
+    U_16 = 2**16 - 1
+
     def __init__(self, red_pin_num=17, green_pin_num=16, blue_pin_num=19, freq=500):
         self.red = PWM(Pin(red_pin_num))
         self.green = PWM(Pin(green_pin_num))
@@ -33,7 +35,7 @@ class RGB_Controller:
         self.blue.duty_u16(blue_u16)
 
         print(f"R: {red_u16}, G: {green_u16}, B: {blue_u16}")
-    
+
     def set_red_u16(self, red_u16):
         """
         Sets the Red diode to specified value in range of 0 to 65535 (16-bit value).
@@ -66,25 +68,27 @@ class RGB_Controller:
         """
         Randomizes and sets R, G, and B diodes within the range of 0 to 65535.
         """
-        rand_red = randint(0, 65535)
-        rand_green = randint(0, 65535)
-        rand_blue = randint(0, 65535)
+        rand_red = randint(0, self.U_16)
+        rand_green = randint(0, self.U_16)
+        rand_blue = randint(0, self.U_16)
 
         self.set_rgb_u16(rand_red, rand_green, rand_blue)
 
-    def effect_randomize(self, duration_seconds, interval_seconds):
-        """
-        Randomizes R, G, and B diodes within the range of 0 to 65535.
+    class Effects:
+        @staticmethod
+        def randomize(controller, duration_seconds, interval_seconds):
+            """
+            Randomizes R, G, and B diodes within the range of 0 to 65535.
 
-        Args:
-        duration (int): The total duration for which to strobe the diodes (in seconds).
-        interval (float): The interval between each strobe (in seconds).
+            Args:
+            controller (RGB_Controller): The RGB controller object.
+            duration_seconds (int): The total duration for which to strobe the diodes (in seconds).
+            interval_seconds (float): The interval between each strobe (in seconds).
 
-        Returns:
-        None
-        """
-        start_time = time()
-        while time() - start_time < duration_seconds:
-            self.random_rgb()
-
-            sleep(interval_seconds)
+            Returns:
+            None
+            """
+            start_time = time()
+            while time() - start_time < duration_seconds:
+                controller.random_rgb()
+                sleep(interval_seconds)
