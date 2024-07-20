@@ -6,10 +6,6 @@ from RGB_Controller import RGB_Controller
 # RGB Controller Setup
 RGB_CONTROLLER = RGB_Controller(17, 16, 19)
 
-red_percent = 0
-green_percent = 0
-blue_percent = 0
-
 # WiFi configuration
 WIFI_SSID = "Malisevic"
 WIFI_PASSWORD = "Ari_bjelov"
@@ -26,6 +22,25 @@ while not WIFI.isconnected():
 
 print("Connected to network!")
 print("IP address:", WIFI.ifconfig()[0])
+
+
+# Function to reconnect to WiFi
+def reconnect_wifi():
+    print("Reconnecting to WiFi...")
+    WIFI.disconnect()
+    WIFI.connect(WIFI_SSID, WIFI_PASSWORD)
+    while not WIFI.isconnected():
+        pass
+    print("Connected to network!")
+    print("IP address:", WIFI.ifconfig()[0])
+
+# Reconnect to WiFi if the connection broke
+def check_wifi_connection(timer):
+    if not WIFI.isconnected():
+        reconnect_wifi()
+
+# Check WiFi connection every 1 minute
+CHECK_CONNECTION_TIMER = Timer(period=60000, mode=Timer.PERIODIC, callback=check_wifi_connection)
 
 # MQTT Configuration
 
