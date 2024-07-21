@@ -34,7 +34,9 @@ class RGB_Controller:
         self.green.duty_u16(green_u16)
         self.blue.duty_u16(blue_u16)
 
-        print(f"R: {red_u16}, G: {green_u16}, B: {blue_u16}")
+        print(
+            f"R: {self.red.duty_u16()}, G: {self.green.duty_u16()}, B: {self.blue.duty_u16()}"
+        )
 
     def set_red_u16(self, red_u16):
         """
@@ -43,7 +45,9 @@ class RGB_Controller:
         """
         self.red.duty_u16(red_u16)
 
-        print(f"R: {self.red}, G: {self.green}, B: {self.blue}")
+        print(
+            f"R: {self.red.duty_u16()}, G: {self.green.duty_u16()}, B: {self.blue.duty_u16()}"
+        )
 
     def set_green_u16(self, green_u16):
         """
@@ -53,16 +57,20 @@ class RGB_Controller:
 
         self.green.duty_u16(green_u16)
 
-        print(f"R: {self.red}, G: {self.green}, B: {self.blue}")
+        print(
+            f"R: {self.red.duty_u16()}, G: {self.green.duty_u16()}, B: {self.blue.duty_u16()}"
+        )
 
     def set_blue_u16(self, blue_u16):
         """
         Sets the Blue diode to specified value in range of 0 to 65535 (16-bit value).
         Prints values to terminal.
         """
-        self.red.duty_u16(blue_u16)
+        self.blue.duty_u16(blue_u16)
 
-        print(f"R: {self.red}, G: {self.green}, B: {self.blue}")
+        print(
+            f"R: {self.red.duty_u16()}, G: {self.green.duty_u16()}, B: {self.blue.duty_u16()}"
+        )
 
     def random_rgb(self):
         """

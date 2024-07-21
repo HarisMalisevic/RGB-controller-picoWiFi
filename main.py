@@ -51,13 +51,13 @@ CHECK_CONNECTION_TIMER = Timer(
 # MQTT Configuration
 
 # MQTT Configuration
-MQTT_SERVER = "broker.hivemq.com"
-MQTT_CLIENT_NAME = "RGB-Controller-Malisevic"
+MQTT_SERVER =  "192.168.1.12" #"broker.hivemq.com"
+MQTT_CLIENT_NAME = "RGB-Controller"
 
-MQTT_TOPIC_RED = b"RGB-Controller-Malisevic/red"
-MQTT_TOPIC_GREEN = b"RGB-Controller-Malisevic/green"
-MQTT_TOPIC_BLUE = b"RGB-Controller-Malisevic/blue"
-MQTT_TOPIC_RGB = b"RGB-Controller-Malisevic/RGB_set"
+MQTT_TOPIC_RED = b"RGB-Controller/red"
+MQTT_TOPIC_GREEN = b"RGB-Controller/green"
+MQTT_TOPIC_BLUE = b"RGB-Controller/blue"
+MQTT_TOPIC_RGB = b"RGB-Controller/RGB_set"
 
 
 def parse_rgb_string(rgb_bytes):
@@ -75,7 +75,7 @@ def parse_rgb_string(rgb_bytes):
     g_scaled = (g / 255) * U_16
     b_scaled = (b / 255) * U_16
 
-    return r_scaled, g_scaled, b_scaled
+    return int(r_scaled), int(g_scaled), int(b_scaled)
 
 
 # Example usage
