@@ -3,14 +3,71 @@ import simple
 from machine import Timer
 from RGB_Controller import RGB_Controller
 
+import json
+import os
+
+CONFIG_FILE_NAME = "config.json"
 U_16 = 2**16 - 1
+
+# Configuration variables
+WIFI_SSID = ""
+WIFI_PASSWORD = ""
+
+MQTT_SERVER = ""
+MQTT_CLIENT_NAME = ""
+
+MQTT_TOPIC_RED = b""
+MQTT_TOPIC_GREEN = b""
+MQTT_TOPIC_BLUE = b""
+MQTT_TOPIC_RGB = b""
+
+
+# Save configuration variables to JSON file
+def save_config():
+    config = {
+        "WIFI_SSID": WIFI_SSID,
+        "WIFI_PASSWORD": WIFI_PASSWORD,
+        "MQTT_SERVER": MQTT_SERVER,
+        "MQTT_CLIENT_NAME": MQTT_CLIENT_NAME,
+        "MQTT_TOPIC_RED": MQTT_TOPIC_RED.decode("utf-8"),
+        "MQTT_TOPIC_GREEN": MQTT_TOPIC_GREEN.decode("utf-8"),
+        "MQTT_TOPIC_BLUE": MQTT_TOPIC_BLUE.decode("utf-8"),
+        "MQTT_TOPIC_RGB": MQTT_TOPIC_RGB.decode("utf-8"),
+    }
+
+    with open(CONFIG_FILE_NAME, "w") as file:
+        file.write(json.dumps(config))
+
+    print(f"Configuration saved to file: {config}")
+
+# Load configuration variables from JSON file
+def load_config():
+    global WIFI_SSID, WIFI_PASSWORD, MQTT_SERVER, MQTT_CLIENT_NAME, MQTT_TOPIC_RED, MQTT_TOPIC_GREEN, MQTT_TOPIC_BLUE, MQTT_TOPIC_RGB
+
+    if not CONFIG_FILE_NAME in os.listdir():
+        print("No configuration file found!")
+        exit()
+
+    with open(CONFIG_FILE_NAME, "r") as file:
+        config = json.load(file)
+
+    WIFI_SSID = config.get("WIFI_SSID")
+    WIFI_PASSWORD = config.get("WIFI_PASSWORD")
+    MQTT_SERVER = config.get("MQTT_SERVER")
+    MQTT_CLIENT_NAME = config.get("MQTT_CLIENT_NAME")
+    MQTT_TOPIC_RED = config.get("MQTT_TOPIC_RED").encode("utf-8")
+    MQTT_TOPIC_GREEN = config.get("MQTT_TOPIC_GREEN").encode("utf-8")
+    MQTT_TOPIC_BLUE = config.get("MQTT_TOPIC_BLUE").encode("utf-8")
+    MQTT_TOPIC_RGB = config.get("MQTT_TOPIC_RGB").encode("utf-8")
+
+    print(f"Configuration loaded from file: {CONFIG_FILE_NAME}")
+
+
+load_config()
 
 # RGB Controller Setup
 RGB_CONTROLLER = RGB_Controller(17, 16, 19)
 
-# WiFi configuration
-WIFI_SSID = "Malisevic"
-WIFI_PASSWORD = "Ari_bjelov"
 
 # Connecting to WiFi
 print("Connecting to WiFi: ", WIFI_SSID)
@@ -48,17 +105,6 @@ CHECK_CONNECTION_TIMER = Timer(
     period=60000, mode=Timer.PERIODIC, callback=check_wifi_connection
 )
 
-# MQTT Configuration
-
-# MQTT Configuration
-MQTT_SERVER =  "192.168.1.12" #"broker.hivemq.com"
-MQTT_CLIENT_NAME = "RGB-Controller"
-
-MQTT_TOPIC_RED = b"RGB-Controller/red"
-MQTT_TOPIC_GREEN = b"RGB-Controller/green"
-MQTT_TOPIC_BLUE = b"RGB-Controller/blue"
-MQTT_TOPIC_RGB = b"RGB-Controller/RGB_set"
-
 
 def parse_rgb_string(rgb_bytes):
     # Decode the bytes object to a string
@@ -76,12 +122,6 @@ def parse_rgb_string(rgb_bytes):
     b_scaled = (b / 255) * U_16
 
     return int(r_scaled), int(g_scaled), int(b_scaled)
-
-
-# Example usage
-rgb_string = b"rgb(86, 255, 0)"
-r, g, b = parse_rgb_string(rgb_string)
-print(r, g, b)
 
 
 # MQTT Filtering recieved messages
