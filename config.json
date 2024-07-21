@@ -1,0 +1,12 @@
+{
+    "WIFI_SSID": "Malisevic",
+    "WIFI_PASSWORD": "Ari_bjelov",
+
+    "MQTT_CLIENT_NAME": "RGB-Controller",
+    "MQTT_SERVER": "192.168.1.12",
+    
+    "MQTT_TOPIC_GREEN": "RGB-Controller/green",
+    "MQTT_TOPIC_BLUE": "RGB-Controller/blue",
+    "MQTT_TOPIC_RGB": "RGB-Controller/RGB_set",
+    "MQTT_TOPIC_RED": "RGB-Controller/red"
+}
