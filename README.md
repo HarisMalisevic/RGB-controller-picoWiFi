@@ -1,6 +1,7 @@
 # How to use:
 
 1. After cloning, set these parameters in config.json:
+```json
 {
     "WIFI_SSID": "ssid",
     "WIFI_PASSWORD": "password",
@@ -13,5 +14,7 @@
     "MQTT_TOPIC_RGB": "RGB-Controller/RGB_set",
     "MQTT_TOPIC_RED": "RGB-Controller/red"
 }
-
+```
 2. Copy all files to Pico W - main.py will autorun on reboot
+
+# Wiring diagram is in progress!
